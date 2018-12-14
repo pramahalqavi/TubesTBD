@@ -2,25 +2,30 @@ import socket
 import time
 import random
 
-s = socket.socket()
+stream = socket.socket()
 host = socket.gethostname()
 port = 12221
-s.bind((host, port))
+stream.bind((host, port))
 
-s.listen(5)
-c = None
+stream.listen(5)
+connection = None
 
 while True:
-   if c is None:
-       print('[Waiting for connection...]')
-       c, addr = s.accept()
-       print('Got connection from', addr)
-   else:
-       k = ""
-       k += chr(random.randint(65,90))
-       k += chr(random.randint(65,90))
-       v = random.randint(1,9999)
-       kv = {'key':k,'value':v}
-       q = str(kv)
-       c.send(q.encode())
-       time.sleep(1)
+  if connection is None:
+    print('[Waiting for connection...]')
+    connection, addr = stream.accept()
+    print('Got connection from', addr)
+  else:
+    bucket = ""
+    bucket += chr(random.randint(65,90))          # bucket first code
+    bucket += chr(random.randint(65,90))          # bucket second code
+    randomItemNumber = random.randint(1,15)       # number of items in the bucket 
+    items = ""
+    for i in range (randomItemNumber) :
+      item = random.randint(1,300)                # number of different item, range id : 1-300
+      items += str(item) + " "
+    
+    data = {'bucket':bucket,'items':items}
+    packet = str(data)
+    connection.send(packet.encode())
+    time.sleep(0.1)

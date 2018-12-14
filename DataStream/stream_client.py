@@ -3,24 +3,24 @@ import threading
 import time
 import random
 
-s = socket.socket()
+stream = socket.socket()
 host = socket.gethostname()
 port = 12221
 
-s.connect((host, port))
+stream.connect((host, port))
 print('Connected to', host)
 
 dataList = []
 
 def listen():
 	while True:
-		message = s.recv(1024)
+		message = stream.recv(1024)
 		if not message:
 			break
-		str_kv = message.decode('ascii')
-		kv = eval(str_kv)
-		dataList.append(kv)
-		print(kv)
+		packet = message.decode('ascii')
+		data = eval(packet)
+		dataList.append(data)
+		print(data)
 
 def sampling(nbucket,delay,loop):
 	for l in range(loop):
