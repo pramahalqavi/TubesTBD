@@ -2,6 +2,7 @@ import socket
 import threading
 import time
 import random
+import datetime
 
 stream = socket.socket()
 host = socket.gethostname()
@@ -11,6 +12,8 @@ stream.connect((host, port))
 print('Connected to', host)
 
 dataList = []
+itemCount = []
+for i in range(0,101): itemCount.append(0)
 
 def listen():
 	while True:
@@ -21,6 +24,7 @@ def listen():
 		data = eval(packet)
 		dataList.append(data)
 		print(data)
+		for x in data['items']: itemCount[x] += 1
 
 def sampling(nbucket,delay,loop):
 	for l in range(loop):
@@ -54,3 +58,4 @@ try:
 except:
 	print("Error: unable to start thread")
 
+# time.mktime(datetime.datetime.strptime(s, "%Y-%m-%d %H:%M:%S").timetuple())
