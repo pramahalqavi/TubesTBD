@@ -27,7 +27,7 @@ def listen():
 		print(data)
 		for x in data['items']: itemCount[x] += 1
 
-def sampling(nbucket,delay,loop):
+def sampling(n,nbucket,delay,loop):
 	for l in range(loop):
 		time.sleep(delay)
 		tempDataList = dataList
@@ -39,8 +39,12 @@ def sampling(nbucket,delay,loop):
 		for x in tempDataList:
 			bucketHash(x,done,buckets)
 		num = [i for i, x in enumerate(buckets) if len(x) > 0]
-		pick = random.choice(num)
-		print("Sampling 1 /",nbucket,"of",len(tempDataList),"data:",buckets[pick])
+		if n <= len(num):
+			pick = []
+			for i in range(n):
+				for j in buckets[i]: pick.append(j)
+		else: pick = buckets[random.choice(num)]
+		print("Sampling",n,"/",nbucket,"of",len(tempDataList),"data:",pick)
 		print()
 
 def bucketHash(data,done,buckets):
@@ -84,10 +88,10 @@ def countItemSets(support,delay,loop):
 
 try:
 	threading.Thread(target=listen).start()
-	threading.Thread(target=sampling, args=(10,10,2)).start()
-	threading.Thread(target=filtering, args=(4,5,4,3)).start()
-	threading.Thread(target=countDistinct, args=(6,3)).start()
-	threading.Thread(target=countItemSets, args=(0.2,8,3)).start()
+	threading.Thread(target=sampling, args=(2,10,10,1)).start()
+	threading.Thread(target=filtering, args=(4,5,4,1)).start()
+	threading.Thread(target=countDistinct, args=(6,1)).start()
+	threading.Thread(target=countItemSets, args=(0.2,8,1)).start()
 
 except:
 	print("Error: unable to start thread")
