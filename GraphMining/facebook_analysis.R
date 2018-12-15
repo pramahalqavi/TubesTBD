@@ -3,6 +3,11 @@ library("igraph")
 fbGraph <- read.table("facebook_combined.txt")
 net <- graph.data.frame(fbGraph)
 net <- as.undirected(net)
+
+V(net)$label <- V(net)$name
+V(net)$degree <- degree(net)
+V(net)$size <- 10 * (V(net)$degree / max(V(net)$degree)) + 4
+V(net)$label.cex <- 1.8 * (V(net)$degree / max(V(net)$degree))
 # plot(net)
 
 # Density - The proportion of present edges from all possible edges in the network.
