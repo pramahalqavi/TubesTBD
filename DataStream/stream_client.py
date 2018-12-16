@@ -14,6 +14,7 @@ print('Connected to', host)
 
 dataList = []
 itemCount = []
+dataToLook = [1,2]
 expireSecondFromNow = 300		# data will be ignored if already been there for 300s
 for i in range(0,11): itemCount.append(0)
 
@@ -69,14 +70,14 @@ def bucketHash(data,done,buckets):
 	buckets[bucket_no].append(data)
 	done[bucket_no] = True
 
-def filtering(min_len,max_len,delay,loop):
+def filtering(containData,delay,loop):
 	for l in range(loop):
 		time.sleep(delay)
 		tempDataList = dataList
 		filtered = []
 		for x in tempDataList:
-			if len(x['items']) >= min_len and len(x['items']) <= max_len: filtered.append(x)
-		print("Filtered Item Length",min_len,"-",max_len,":",filtered)
+			if all(elem in x['items']  for elem in containData): filtered.append(x)
+		print("Filtered data containing",containData,":\n",filtered)
 		print()
 
 def countDistinct(delay,loop):
@@ -103,7 +104,7 @@ try:
 	threading.Thread(target=listen).start()
 	threading.Thread(target=checkDataExpiry, args=[expireSecondFromNow]).start()
 	threading.Thread(target=sampling, args=(2,10,10,1)).start()
-	threading.Thread(target=filtering, args=(4,5,4,1)).start()
+	threading.Thread(target=filtering, args=(dataToLook,4,1)).start()
 	threading.Thread(target=countDistinct, args=(6,1)).start()
 	threading.Thread(target=countItemSets, args=(0.2,8,1)).start()
 
