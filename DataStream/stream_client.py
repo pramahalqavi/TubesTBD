@@ -14,6 +14,7 @@ print('Connected to', host)
 
 dataList = []
 itemCount = []
+expireSecondFromNow = 300		# data will be ignored if already been there for 300s
 for i in range(0,11): itemCount.append(0)
 
 def listen():
@@ -23,6 +24,17 @@ def listen():
 			break
 		packet = message.decode('ascii')
 		data = eval(packet)
+
+		# deleting expired data on datalist
+		expiredTime = datetime.datetime.now() - datetime.timedelta(seconds=expireSecondFromNow)
+		checkExpiry = False
+		while (not(checkExpiry) and (len(dataList) != 0)) :
+			if (datetime.datetime.strptime(dataList[0]['time'], '%Y-%m-%d %H:%M:%S') < expiredTime) :
+				dataList.pop(0)
+			else :
+				checkExpiry = True
+
+		# append new coming data
 		dataList.append(data)
 		print(data)
 		for x in data['items']: itemCount[x] += 1
