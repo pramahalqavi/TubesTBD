@@ -24,20 +24,21 @@ def listen():
 			break
 		packet = message.decode('ascii')
 		data = eval(packet)
-
-		# deleting expired data on datalist
-		expiredTime = datetime.datetime.now() - datetime.timedelta(seconds=expireSecondFromNow)
-		checkExpiry = False
-		while (not(checkExpiry) and (len(dataList) != 0)) :
-			if (datetime.datetime.strptime(dataList[0]['time'], '%Y-%m-%d %H:%M:%S') < expiredTime) :
-				dataList.pop(0)
-			else :
-				checkExpiry = True
-
-		# append new coming data
 		dataList.append(data)
 		print(data)
 		for x in data['items']: itemCount[x] += 1
+
+def checkDataExpiry(expiredTimeInSecond) :
+	while True :
+		time.sleep(expiredTimeInSecond)
+		expiredTime = datetime.datetime.now() - datetime.timedelta(seconds=expiredTimeInSecond)
+		checkExpiry = False
+		while (not(checkExpiry) and (len(dataList) != 0)) :
+			if (datetime.datetime.strptime(dataList[0]['time'], '%Y-%m-%d %H:%M:%S') < expiredTime) :
+				data = dataList.pop(0)
+				for x in data['items']: itemCount[x] -= 1
+			else :
+				checkExpiry = True
 
 def sampling(n,nbucket,delay,loop):
 	for l in range(loop):
@@ -100,6 +101,7 @@ def countItemSets(support,delay,loop):
 
 try:
 	threading.Thread(target=listen).start()
+	threading.Thread(target=checkDataExpiry, args=[expireSecondFromNow]).start()
 	threading.Thread(target=sampling, args=(2,10,10,1)).start()
 	threading.Thread(target=filtering, args=(4,5,4,1)).start()
 	threading.Thread(target=countDistinct, args=(6,1)).start()
